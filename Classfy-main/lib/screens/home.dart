@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:line_icons/line_icons.dart';
+import 'package:classfy/widgets/custom_nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:classfy/screens/calendar_page.dart';
 import 'dart:io';
 import 'package:classfy/screens/file_viewer_screen.dart';
 import 'package:video_player/video_player.dart';
+import 'package:classfy/screens/comment_page.dart';
+import 'package:classfy/screens/notification_page.dart';
 
 
 
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  final _selectedIndex = 0;
   String _currentFolder = '';
   final List<Map<String, String>> _items = [];
   String _searchQuery = '';
@@ -29,10 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         MaterialPageRoute(builder: (context) => const CalendarPage()),
       );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+         MaterialPageRoute(builder: (context) => const CommentPage()),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+         MaterialPageRoute(builder: (context) => const NotificationPage()),
+      );
     }
   }
 
@@ -77,15 +84,22 @@ class _HomeScreenState extends State<HomeScreen> {
             onChanged: (value) => setState(() => _searchQuery = value),
           ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: CircleAvatar(
-              backgroundColor: Colors.brown,
-              radius: 18,
-            ),
-          ),
-        ],
+       actions: [
+  Padding(
+    padding: const EdgeInsets.only(right: 10),
+    child: GestureDetector(
+      onTap: () {
+        _showProfileDialog(); // Call the new method
+      },
+      child: const CircleAvatar(
+        backgroundColor: Colors.brown,
+        radius: 18,
+        child: Icon(Icons.person, color: Colors.white, size: 20),
+      ),
+    ),
+  ),
+],
+
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -197,42 +211,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: const BoxDecoration(
-          color: Color(0xFF7D4A3B),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-          child: GNav(
-            rippleColor: Colors.grey[800]!,
-            hoverColor: Colors.grey[700]!,
-            haptic: true,
-            tabBorderRadius: 20,
-            gap: 8,
-            backgroundColor: const Color(0xFF7D4A3B),
-            color: Colors.black54,
-            activeColor: Colors.black,
-            iconSize: 24,
-            tabBackgroundColor: const Color.fromRGBO(255, 255, 255, 0.9),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            selectedIndex: _selectedIndex,
-            onTabChange: onItemTapped,
-            tabs: const [
-              GButton(icon: LineIcons.home, text: ''),
-              GButton(icon: LineIcons.calendar, text: ''),
-              GButton(icon: LineIcons.comment, text: ''),
-              GButton(icon: LineIcons.bell, text: ''),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: CustomNavBar(
+  selectedIndex: _selectedIndex,
+  onTabChange: onItemTapped, // ✅ No underscore
+),
     );
   }
+void _showProfileDialog() {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 30,
+              child: Icon(Icons.person, size: 40),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Salah', // <-- Replace with your actual name variable if needed
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 5),
+            const Text(
+              'salah@example.com', // <-- Replace with actual email
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildImportButton(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
