@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:classfy/screens/task_model.dart';
 
-
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
@@ -31,8 +30,6 @@ class DatabaseHelper {
         motDePasse TEXT
       )
     ''');
-
- 
 
     await db.execute('''
       CREATE TABLE Dossier (
@@ -100,15 +97,37 @@ class DatabaseHelper {
         FOREIGN KEY (planificationId) REFERENCES Planification(id)
       )
     ''');
+
   }
 
   Future close() async {
     final db = await instance.database;
     db.close();
   }
-   Future<int> insertTask(TaskModel task) async {
-  final db = await instance.database;
-  return await db.insert('Task', task.toMap());
-   }
- 
+
+  Future<int> insertTask(TaskModel task) async {
+    final db = await instance.database;
+    return await db.insert('Task', task.toMap());
+  }
+
+  // DELETE method to remove a task from the database by its ID
+  Future<int> deleteEvent(int eventId) async {
+    final db = await instance.database;
+    return await db.delete(
+      'Task',
+      where: 'id = ?',
+      whereArgs: [eventId],
+    );
+  }
+
+  // UPDATE method to modify an existing task
+  Future<int> updateEvent(TaskModel task) async {
+    final db = await instance.database;
+    return await db.update(
+      'Task',
+      task.toMap(),
+      where: 'id = ?',
+      whereArgs: [task.id],
+    );
+  }
 }

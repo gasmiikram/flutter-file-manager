@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
       theme: lightMode,
       home: const WelcomeScreen(),
       routes: {'/addTask': (context) => const AddTaskPage()},
+      
     );
   }
 }
